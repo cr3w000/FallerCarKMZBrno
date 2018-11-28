@@ -1,3 +1,7 @@
+
+
+
+
 /*
 KMZ Brno
 Ovladani zastavky pro Faller car autobus
@@ -16,7 +20,7 @@ const int digitalOutPin3 = 4; // Digital output pin
 
 //prejezdy
 const int analogInPinP1 = A0;  // Analog input pin 
-//const int analogInPinP2 = A1;  // Analog input pin 
+const int analogInPinP2 = A1;  // Analog input pin 
 //const int analogInPinP3 = A3;  // Analog input pin 
 //const int analogInPinP4 = A4;  // Analog input pin 
 
@@ -33,7 +37,9 @@ const int MAGNET_ON = 0;
 const int PRUMER_SIZE = 10;
 //Prah pro detekci prujezdu
 const int PRAH = 20;
-const int PRAH_PREJEZD = 50;
+const int PRAH_PREJEZD = 25;
+const int PRAH_PREJEZD2 = 20;
+
 
 //Cas v zastavce. t=2*CAS_V_ZASTAVCE [ms]
 const int CAS_V_ZASTAVCE = 4000;
@@ -53,7 +59,7 @@ int sensorValue3 = 0;        // value read
 int outputValue3 = 0;        // magnet control
 
 int sensorValueP1 = 0;        // value read
-//int sensorValueP2 = 0;        // value read
+int sensorValueP2 = 0;        // value read
 //int sensorValueP3 = 0;        // value read
 //int sensorValueP4 = 0;        // value read
 int outputValueP = 0;        // magnet control
@@ -75,14 +81,15 @@ int timer3 = 0;
 
 int prumer_matrixP1[PRUMER_SIZE];
 int prumerP1;
-/*int prumer_matrixP2[PRUMER_SIZE];
+int prumer_matrixP2[PRUMER_SIZE];
 int prumerP2;
-int prumer_matrixP3[PRUMER_SIZE];
+/*int prumer_matrixP3[PRUMER_SIZE];
 int prumerP3;
 int prumer_matrixP4[PRUMER_SIZE];
 int prumerP4;*/
 int timerP = 0;
 int prumer_iteratorP = 0;
+int prejezdzpozdeni = 0;
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -264,9 +271,9 @@ void loop() {
   prumer_matrixP1[prumer_iteratorP] = sensorValueP1;
 
 // read the analog in value:
-//  sensorValueP2 = analogRead(analogInPinP2);
-  //store sensor value
-//  prumer_matrixP2[prumer_iteratorP] = sensorValueP2;
+  sensorValueP2 = analogRead(analogInPinP2);
+//  store sensor value
+  prumer_matrixP2[prumer_iteratorP] = sensorValueP2;
 
   // read the analog in value:
  // sensorValueP3 = analogRead(analogInPinP3);
@@ -288,7 +295,7 @@ void loop() {
     }
     prumerP1 = prumerP1 / PRUMER_SIZE;
     prumerP1 = prumerP1 / 10;
-/*
+
     prumerP2=0;
     for(int i=0;i<PRUMER_SIZE;i++){
       prumerP2+=prumer_matrixP2[i];
@@ -296,7 +303,7 @@ void loop() {
     prumerP2 = prumerP2 / PRUMER_SIZE;
     prumerP2 = prumerP2 / 10;
 
-    prumerP3=0;
+/*    prumerP3=0;
     for(int i=0;i<PRUMER_SIZE;i++){
       prumerP3+=prumer_matrixP3[i];
     }
@@ -312,20 +319,38 @@ void loop() {
 */
     
     prumer_iteratorP=0;
-    //   Serial.println(prumerP);    
+       Serial.println(prumerP2);    
 
 //    if((prumerP1 > PRAH_PREJEZD) && (prumerP2 > PRAH_PREJEZD) && (prumerP3 > PRAH_PREJEZD)  && (prumerP4 > PRAH_PREJEZD) ){
-    if( prumerP1 > PRAH_PREJEZD ){
+    if(( prumerP1 > PRAH_PREJEZD) &&(prumerP2 > PRAH_PREJEZD2) ){
     //No train, magnet off
-       digitalWrite(digitalOutPinP, MAGNET_OFF);
- //    Serial.println("PREJEZD OFF");    
+//       digitalWrite(digitalOutPinP, MAGNET_OFF);
+    prejezdzpozdeni--;
+    if(prejezdzpozdeni < 0)
+        prejezdzpozdeni = 0;
+     
+     Serial.println("PREJEZD OFF");    
     }
     else
     {
     //Train approaching, magnet ON
-       digitalWrite(digitalOutPinP, MAGNET_ON);
-   //   Serial.println("PREJEZD ON");
+     //  digitalWrite(digitalOutPinP, MAGNET_ON);
+         prejezdzpozdeni++;
+      if(prejezdzpozdeni > 20)
+        prejezdzpozdeni = 20;
+      Serial.println("PREJEZD ON");
     }
+
+    if(prejezdzpozdeni > 10)
+    {
+       digitalWrite(digitalOutPinP, MAGNET_ON);
+      
+    }
+    else
+    {
+            digitalWrite(digitalOutPinP, MAGNET_OFF);
+
+    }    
  }
 
 
