@@ -27,7 +27,7 @@ const int analogInPinP2 = A1;  // Analog input pin
 
 
 const int digitalOutPinP = 5; // Digital output pin 
-
+const int digitalOutPinV = 6;
 
 //magnet state mapping to pin value
 const int MAGNET_OFF = 1;
@@ -90,6 +90,7 @@ int prumerP4;*/
 int timerP = 0;
 int prumer_iteratorP = 0;
 int prejezdzpozdeni = 0;
+int stavVyhybka = 0;
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -102,6 +103,8 @@ void setup() {
   digitalWrite(digitalOutPin3, MAGNET_OFF);
   pinMode(digitalOutPinP, OUTPUT);
   digitalWrite(digitalOutPin3, MAGNET_OFF);
+  pinMode(digitalOutPinV, OUTPUT);
+
 }
 
 void loop() {
@@ -128,7 +131,7 @@ void loop() {
       if(state1 == 0){
         //previous state was 0, report state change
         Serial.println();
-        Serial.println("State 1 changed to 1");
+        Serial.println("State 0 changed to 1");
 
         //activate output and start timer
         digitalWrite(digitalOutPin1, MAGNET_ON);
@@ -143,7 +146,15 @@ void loop() {
       if(state1 == 1){
         //previous state was 1, report state change
         Serial.println();
-        Serial.println("State 1 changed to 0");     
+        Serial.println("State 1 changed to 0");  
+
+       //prehod vyhybku
+       stavVyhybka = !stavVyhybka;
+       Serial.println();
+       Serial.print("Vyhybka stav: ");  
+       Serial.print(stavVyhybka);
+       digitalWrite(digitalOutPinV, stavVyhybka);
+
       }
       state1 = 0;
     }
@@ -319,7 +330,7 @@ void loop() {
 */
     
     prumer_iteratorP=0;
-       Serial.println(prumerP2);    
+  //     Serial.println(prumerP2);    
 
 //    if((prumerP1 > PRAH_PREJEZD) && (prumerP2 > PRAH_PREJEZD) && (prumerP3 > PRAH_PREJEZD)  && (prumerP4 > PRAH_PREJEZD) ){
     if(( prumerP1 > PRAH_PREJEZD) &&(prumerP2 > PRAH_PREJEZD2) ){
@@ -329,7 +340,7 @@ void loop() {
     if(prejezdzpozdeni < 0)
         prejezdzpozdeni = 0;
      
-     Serial.println("PREJEZD OFF");    
+   //  Serial.println("PREJEZD OFF");    
     }
     else
     {
@@ -338,7 +349,7 @@ void loop() {
          prejezdzpozdeni++;
       if(prejezdzpozdeni > 20)
         prejezdzpozdeni = 20;
-      Serial.println("PREJEZD ON");
+   //   Serial.println("PREJEZD ON");
     }
 
     if(prejezdzpozdeni > 10)
