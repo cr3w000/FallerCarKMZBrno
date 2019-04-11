@@ -26,13 +26,18 @@ const int analogInPinP2 = A7;  // Analog input pin
 //const int analogInPinP3 = A3;  // Analog input pin 
 //const int analogInPinP4 = A4;  // Analog input pin 
 
-const int buttonPin1 = 9;
-const int buttonPin2 = 10;
-const int buttonPin3 = 11;
-const int buttonPin4 = 12;
+const int buttonPin1 = 12;
+const int buttonPin2 = 11;
+const int buttonPin3 = 10;
+const int buttonPin4 = 9;
 
 const int digitalOutPinP = 5; // Digital output pin 
 const int digitalOutPinV = 6;
+
+//Unused pins, but connected to relay board so need to be set to off
+const int digitalOutPinU1 = 7;
+const int digitalOutPinU2 = 8;
+const int digitalOutPinU3 = 13;
 
 //magnet state mapping to pin value
 const int MAGNET_OFF = 1;
@@ -116,8 +121,23 @@ void setup() {
   pinMode(digitalOutPin3, OUTPUT);
   digitalWrite(digitalOutPin3, MAGNET_OFF);
   pinMode(digitalOutPinP, OUTPUT);
-  digitalWrite(digitalOutPin3, MAGNET_OFF);
+  digitalWrite(digitalOutPinP, MAGNET_OFF);
   pinMode(digitalOutPinV, OUTPUT);
+  digitalWrite(digitalOutPinV, MAGNET_OFF);
+
+
+  //switch off unused output pins
+    pinMode(digitalOutPinU1, OUTPUT);
+  digitalWrite(digitalOutPinU1, MAGNET_OFF);
+    pinMode(digitalOutPinU2, OUTPUT);
+  digitalWrite(digitalOutPinU2, MAGNET_OFF);
+    pinMode(digitalOutPinU3, OUTPUT);
+  digitalWrite(digitalOutPinU3, MAGNET_OFF);
+
+  pinMode(buttonPin1, INPUT_PULLUP);
+  pinMode(buttonPin2, INPUT_PULLUP);
+  pinMode(buttonPin3, INPUT_PULLUP);
+  pinMode(buttonPin4, INPUT_PULLUP);
 
 }
 
@@ -350,12 +370,16 @@ if(!master_stop){
   }
 }
   //master stop
-  buttonState4 = digitalRead(buttonPin4);
-  if (buttonState4 == LOW){
+//  buttonState4 = digitalRead(buttonPin4);
+  if (digitalRead(buttonPin4) == LOW){
     if(buttonState4 == 0){
-      //bylo stisknuto tlacitko 4
+      //bylo stisknuto tlacitko 3
+      Serial.println("Stisknuto tlacitko 4");
+
       master_stop = !master_stop;
       if(master_stop){
+        Serial.println("Master stop aktivni");
+
         digitalWrite(digitalOutPin1, MAGNET_ON);
         digitalWrite(digitalOutPin2, MAGNET_ON);
         digitalWrite(digitalOutPin3, MAGNET_ON);
@@ -363,6 +387,7 @@ if(!master_stop){
       }
       else
       {
+        Serial.println("Master stop neaktivni");
         digitalWrite(digitalOutPin1, MAGNET_OFF);
         digitalWrite(digitalOutPin2, MAGNET_OFF);
         digitalWrite(digitalOutPin3, MAGNET_OFF);
@@ -377,16 +402,22 @@ if(!master_stop){
   }
   
   //prejezdy stop
-  buttonState3 = digitalRead(buttonPin3);
-  if (buttonState3 == LOW){
+//  buttonState3 = digitalRead(buttonPin3);
+  if (digitalRead(buttonPin3) == LOW){
     if(buttonState3 == 0){
-      //bylo stisknuto tlacitko 4
+      //bylo stisknuto tlacitko 3
+      Serial.println("Stisknuto tlacitko 3");
+
       prejezdy_stop = !prejezdy_stop;
       if(prejezdy_stop){
+        Serial.println("Prejezdy stop aktivni");
+
         digitalWrite(digitalOutPinP, MAGNET_ON);
       }
       else
       {
+        Serial.println("Prejezdy stop neaktivni");
+
         digitalWrite(digitalOutPinP, MAGNET_OFF);
       }
     }
